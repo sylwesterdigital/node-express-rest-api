@@ -2,7 +2,8 @@ var express = require("express");
 var app = express();
 var md5 = require('md5');
 var config = require("./config.js")
-
+const fs = require('fs');
+const https = require('https');
 
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -15,8 +16,16 @@ var response = require("./response.js")
 var HTTP_PORT = config.HTTP_PORT;
 var SESSION_TIMEOUT = config.SESSION_TIMEOUT * 1000;
 
+
+var options = {
+	key: fs.readFileSync('/etc/letsencrypt/live/flaboy.com/privkey.pem'),
+	cert: fs.readFileSync('/etc/letsencrypt/live/flaboy.com/fullchain.pem')
+};
+
+var server = https.createServer(options, app);
+
 // Start server
-app.listen(HTTP_PORT, () => {
+server.listen(HTTP_PORT, () => {
     console.log("Server running on port %PORT%".replace("%PORT%",HTTP_PORT));
 });
 
